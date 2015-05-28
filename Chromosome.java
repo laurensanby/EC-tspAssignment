@@ -107,4 +107,26 @@ class Chromosome {
             }
         }
     }
+
+    public static Chromosome[] uniformCrossover(Chromosome[] parents)
+    {
+        double probability = 0.5;
+        double randomNum;
+        Chromosome parent1, parent2;
+        Chromosome[] children = new Chromosome[parents.length];
+        for (int i=0; i<parents.length; i++)
+        {
+            parent1 = parents[i];
+            parent2 = parents[i+1];
+            for (int j=0; j<parent1.cityList.length; j++)
+            {
+                randomNum = Math.random();
+                if (randomNum < probability)
+                {
+                    
+                }
+            }    
+        }
+        return children;
+    }
 }

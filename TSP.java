@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Arrays;
 import java.awt.*; 
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -104,45 +105,71 @@ public class TSP {
 
     public static void evolve() {
         //Write evolution code here.
-        int selectedParents = populationSize/2;
-        Chromosone.sortChromosomes(chromosomes, populationSize);
-        
+        matingPopulationSize = populationSize/5*4;
+        selectedParents = populationSize/2;
+        Chromosome.sortChromosomes(chromosomes, populationSize);
+        Chromosome[] temp = new Chromosome[selectedParents];
         //Choose random number to decide selection method
+        double randomNum = Math.random();
                 
         //Selection        
         //????Linear scaling? f(z) = az + b (a,b = max,min fitness)
-			
-        //Elitist: Choose Chromosones with min cost
-        Chromosome[] temp = new Chromosome[selectedParents];
-        for (int i=0; i<selectedParents; i++)
-        {
-			temp[i] = chromosomes[i];
-		}
-        
-        //Roulette Wheel: Fitter genotypes get larger slices of the wheel than less fit ones
-        //*Chromosome.sortChromosomes(chromosomes, populationSize);
-        //populationSize/5
-        //1 = 40%, 2 = 25%, 3 = 20%, 4 = 10%, 5 = 5%
-        //1/5 = 0-40, 2/5 = 41-65, 3/5 = 66-85, 4/5 = 86-95, 5/5 = 96-100
-        
-        //Rank: Genotypes ranked by fitness. Selection probablity calculated based on rank
-        //*Chromosome.sortChromosomes(chromosomes, populationSize);
-        //Select ith genotype with probability p[i] - linear selection
-        //selectionPressure = 1.5 for medium selection pressure (1<sP<2)
-        //p[i] = (1/populationsize)*((2-selectionPressure)+(selectionPressure - (2 - selectionPressure))*((i-1)/(populationsize-1)))
-        
+        	//Roulette Wheel: Fitter genotypes get larger slices of the wheel than less fit ones
+            //populationSize/5
+            //1= 40%, 2 = 25%, 3 = 20%, 4 = 10%, 5 = 5%
+            //1/5 = 0-40, 2/5 = 41-65, 3/5 = 66-85, 4/5 = 86-95, 5/5 = 96-100	
         //Tournament: Subsets of genotypes randomly selected, fittest genotypes selected
         //2<K<populationSize tournament genotypes randomly selected
         //Deterministic vs Probabilistic
         //D: Fittest individual selected and removed from tournament set
         //P: Fittest individual selected and removed with probability p.
-        //Repeated for as many genotypes must be recombined
-        
+        //Repeated for as many genotypes must be recombined  
+        if (randomNum<0.1)	
+        {
+        //Elitist: Choose Chromosones with min cost            
+            for (int i=0; i<selectedParents; i++)
+            {
+    			temp[i] = chromosomes[i];
+    		}
+        }
+        else
+        {
+        //Rank: Genotypes ranked by fitness. Selection probablity calculated based on rank
+            double p = 0;
+            int count = 0;            
+            ArrayList<Integer> chosen = new ArrayList<Integer>();
+            //Select ith genotype with probability p[i] - linear selection
+            double selectionPressure = 1.5; //for medium selection pressure (1<sP<2)
+            double worstGenotype = 2 - selectionPressure;
+            //p[i] = (1/populationsize)*((2-selectionPressure)+(selectionPressure - (2 - selectionPressure))*((i-1)/(populationsize-1)))
+            while (count<selectedParents) //REPEAT UNTIL count-1 == selectedParents
+            {
+                for (int i=0; i<matingPopulationSize; i++)
+                {
+                    if (!(chosen.contains(i)))
+                    {
+                        //Linear Ranking
+                        p = (1/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1)/(populationSize-1))));
+                        randomNum = Math.random();
+                        if ((randomNum < p)&&(count < selectedParents))
+                        {
+                            temp[count] = chromosomes[i];
+                            //remove chromosome from chromosomes
+                            chosen.add(i);
+                            count++;
+                        }
+                    }                   
+                }
+            }
+        }       
        
-        //Recombination
+        //Recombination **method call to Chromosone.java  
         
-       
-        //Mutation
+        
+        //Mutation **method call to Chromosone.java **with Probability
+
+        //Replacement *Survival Selection
+        //Elitist?
     }
 
     /**
