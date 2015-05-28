@@ -26,7 +26,7 @@ public class TSP {
     protected static int populationSize;
 
     /**
-     * The part of the population eligable for mateing.
+     * The part of the population eligable for mating.
      */
     protected static int matingPopulationSize;
 
@@ -104,6 +104,45 @@ public class TSP {
 
     public static void evolve() {
         //Write evolution code here.
+        int selectedParents = populationSize/2;
+        Chromosone.sortChromosomes(chromosomes, populationSize);
+        
+        //Choose random number to decide selection method
+                
+        //Selection        
+        //????Linear scaling? f(z) = az + b (a,b = max,min fitness)
+			
+        //Elitist: Choose Chromosones with min cost
+        Chromosome[] temp = new Chromosome[selectedParents];
+        for (int i=0; i<selectedParents; i++)
+        {
+			temp[i] = chromosomes[i];
+		}
+        
+        //Roulette Wheel: Fitter genotypes get larger slices of the wheel than less fit ones
+        //*Chromosome.sortChromosomes(chromosomes, populationSize);
+        //populationSize/5
+        //1 = 40%, 2 = 25%, 3 = 20%, 4 = 10%, 5 = 5%
+        //1/5 = 0-40, 2/5 = 41-65, 3/5 = 66-85, 4/5 = 86-95, 5/5 = 96-100
+        
+        //Rank: Genotypes ranked by fitness. Selection probablity calculated based on rank
+        //*Chromosome.sortChromosomes(chromosomes, populationSize);
+        //Select ith genotype with probability p[i] - linear selection
+        //selectionPressure = 1.5 for medium selection pressure (1<sP<2)
+        //p[i] = (1/populationsize)*((2-selectionPressure)+(selectionPressure - (2 - selectionPressure))*((i-1)/(populationsize-1)))
+        
+        //Tournament: Subsets of genotypes randomly selected, fittest genotypes selected
+        //2<K<populationSize tournament genotypes randomly selected
+        //Deterministic vs Probabilistic
+        //D: Fittest individual selected and removed from tournament set
+        //P: Fittest individual selected and removed with probability p.
+        //Repeated for as many genotypes must be recombined
+        
+       
+        //Recombination
+        
+       
+        //Mutation
     }
 
     /**
