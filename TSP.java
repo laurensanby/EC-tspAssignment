@@ -107,69 +107,88 @@ public class TSP {
         //Write evolution code here.
         matingPopulationSize = populationSize/5*4;
         selectedParents = populationSize/2;
+        if (selectedParents%2==1)
+        {
+            selectedParents++;
+        }
         Chromosome.sortChromosomes(chromosomes, populationSize);
-        Chromosome[] temp = new Chromosome[selectedParents];
+        //Chromosome[] temp = new Chromosome[selectedParents];
         //Choose random number to decide selection method
         double randomNum = Math.random();
-                
+        Chromosome parent1 = null;
+        Chromosome parent2 = null;
+        Chromosome[] temp;
+        Chromosome[] children = new Chromosome[selectedParents];
         //Selection        
-        //????Linear scaling? f(z) = az + b (a,b = max,min fitness)
-        	//Roulette Wheel: Fitter genotypes get larger slices of the wheel than less fit ones
-            //populationSize/5
-            //1= 40%, 2 = 25%, 3 = 20%, 4 = 10%, 5 = 5%
-            //1/5 = 0-40, 2/5 = 41-65, 3/5 = 66-85, 4/5 = 86-95, 5/5 = 96-100	
-        //Tournament: Subsets of genotypes randomly selected, fittest genotypes selected
-        //2<K<populationSize tournament genotypes randomly selected
-        //Deterministic vs Probabilistic
-        //D: Fittest individual selected and removed from tournament set
-        //P: Fittest individual selected and removed with probability p.
-        //Repeated for as many genotypes must be recombined  
-        if (randomNum<0.1)	
-        {
-        //Elitist: Choose Chromosones with min cost            
-            for (int i=0; i<selectedParents; i++)
-            {
-    			temp[i] = chromosomes[i];
-    		}
-        }
-        else
-        {
         //Rank: Genotypes ranked by fitness. Selection probablity calculated based on rank
-            double p = 0;
-            int count = 0;            
-            ArrayList<Integer> chosen = new ArrayList<Integer>();
-            //Select ith genotype with probability p[i] - linear selection
-            double selectionPressure = 1.5; //for medium selection pressure (1<sP<2)
-            double worstGenotype = 2 - selectionPressure;
-            //p[i] = (1/populationsize)*((2-selectionPressure)+(selectionPressure - (2 - selectionPressure))*((i-1)/(populationsize-1)))
-            while (count<selectedParents) //REPEAT UNTIL count-1 == selectedParents
+        double p = 0;
+        int count = 0;            
+        ArrayList<Integer> chosen = new ArrayList<Integer>();
+        //Select ith genotype with probability p[i] - linear selection
+        double selectionPressure = 1.5; //for medium selection pressure (1<sP<2)
+        double worstGenotype = 2 - selectionPressure;
+            
+        for (int outeri=0; outeri<selectedParents; outeri+=2)
+        {
+            count =0;
+            while (count<2)
             {
                 for (int i=0; i<matingPopulationSize; i++)
                 {
-                    if (!(chosen.contains(i)))
+                    if (!(chosen.contains(i)) && (count<2))
                     {
                         //Linear Ranking
-                        p = (1/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1)/(populationSize-1))));
+                        p = (1.0/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1.0)/(populationSize-1.0))));
                         randomNum = Math.random();
-                        if ((randomNum < p)&&(count < selectedParents))
+                        if (randomNum < p)
                         {
-                            temp[count] = chromosomes[i];
+                            if (count<1)
+                            {
+                                parent1 = chromosomes[i];
+                                chosen.add(i);
+                                //System.out.println(outeri+" chosen "+ chromosomes[i].getCost());
+                                count++;
+                            }
+                            
+                            else
+                            {
+                                parent2 = chromosomes[i];
+                                chosen.add(i);
+                                //System.out.println(outeri+" chosen "+ chromosomes[i].getCost());
+                                count++;
+                                break;
+                            }
                             //remove chromosome from chromosomes
-                            chosen.add(i);
-                            count++;
+                            
                         }
-                    }                   
-                }
-            }
-        }       
+                    }                  
+                }  
+            }   
+
        
-        //Recombination **method call to Chromosone.java  
-        
+            //Recombination **method call to Chromosone.java  
+            //System.out.println("Parent1 cost "+parent1.getCost());
+            //System.out.println("Parent2 cost "+parent2.getCost());
+            temp = Chromosome.uniformOrderBasedCrossover(parent1, parent2, cities);
+            for (int i=0; i<2; i++)
+            {
+                temp[i].calculateCost(cities);
+                //System.out.println("Temp "+i+" cost: "+temp[i].getCost());
+                children[outeri+i] = temp[i];
+            }
+        }
         
         //Mutation **method call to Chromosone.java **with Probability
 
         //Replacement *Survival Selection
         //Elitist?
+        int index = 0;
+        for (int i=populationSize-selectedParents; i<populationSize; i++)
+        {
+            chromosomes[i] = children[index];
+            index++;
+        }
+        
     }
 
     /**

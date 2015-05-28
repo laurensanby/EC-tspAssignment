@@ -108,25 +108,57 @@ class Chromosome {
         }
     }
 
-    public static Chromosome[] uniformCrossover(Chromosome[] parents)
+    public static Chromosome[] uniformOrderBasedCrossover(Chromosome parent1, Chromosome parent2, City[] cities)
     {
         double probability = 0.5;
         double randomNum;
-        Chromosome parent1, parent2;
-        Chromosome[] children = new Chromosome[parents.length];
-        for (int i=0; i<parents.length; i++)
+        ArrayList<Integer> notSwappedIndices = new ArrayList<Integer>();
+        ArrayList<Integer> child1Values = new ArrayList<Integer>();
+        ArrayList<Integer> child2Values = new ArrayList<Integer>();
+       
+        Chromosome[] children = new Chromosome[2];
+            
+        children[0] = new Chromosome(cities);
+        children[1] = new Chromosome(cities);
+            
+            
+        for (int j=0; j<parent1.cityList.length; j++)
         {
-            parent1 = parents[i];
-            parent2 = parents[i+1];
-            for (int j=0; j<parent1.cityList.length; j++)
+            randomNum = Math.random();
+            if (randomNum < probability)
             {
-                randomNum = Math.random();
-                if (randomNum < probability)
-                {
-                    
-                }
-            }    
-        }
+                children[0].setCity(j, parent1.getCity(j));
+                child1Values.add(parent1.getCity(j));
+                
+                children[1].setCity(j, parent2.getCity(j));
+                child2Values.add(parent2.getCity(j));
+               
+            }
+            else
+            {
+                notSwappedIndices.add(j);
+            }
+        } 
+        int index1 = 0;
+        int index2 = 0;
+        for (int j=0; j<notSwappedIndices.size(); j++)
+        {
+            while (child1Values.contains(parent2.getCity(index1)))
+            {
+                index1++;
+            }
+            
+            children[0].setCity(notSwappedIndices.get(j), parent2.getCity(index1));
+            child1Values.add(parent2.getCity(index1));
+
+            while (child2Values.contains(parent1.getCity(index2)))
+            {
+                index2++;
+            }
+            children[1].setCity(notSwappedIndices.get(j), parent1.getCity(index2));
+            child2Values.add(parent1.getCity(index2));
+        
+        }   
         return children;
     }
 }
