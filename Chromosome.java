@@ -162,19 +162,65 @@ class Chromosome {
         return children;
     }
 
-    public static void mutate(Chromosome child)
+    public void mutate()
     {
+       // double randomNum = Math.random();
+
         //Inversion
-        //cut out random segment, and re-insert in opposite direction
+        //if (randomNum<0.5)
+            inversion();
+
+        //randomNum = Math.random();
 
         //Translocation (insertion)
-        //Select random position and insert into new random position
+        //if (randomNum<0.5)
+            translocation();
 
         //Transposition (2-exchange)
         //Exchange two randomly chosen points
 
         //3-point exchange (shifting)
         // Shift randomly chosen segment (between two points) to a third point.
+    }
+
+    public void translocation()
+    {
+        //Select random position and insert into new random position
+        Random generator = new Random();
+        int randomNum = generator.nextInt(cityList.length);
+        int randomNum2 = generator.nextInt(cityList.length);
+        int min = Math.min(randomNum,randomNum2);
+        int max = Math.max(randomNum,randomNum2);
+        int tempCity = getCity(min);
+        for (int i=min; i<max; i++)
+        {
+            setCity(i, getCity(i+1));
+        }
+        setCity(max, tempCity);
+    }
+
+    public void inversion()
+    {
+        //cut out random segment, and re-insert in opposite direction
+        Random generator = new Random();
+        //CHOOSE length, and then choose starting value and then choose starting value to min of length and totallength-start
+        int randomNum = generator.nextInt(cityList.length);
+        int randomNum2 = generator.nextInt(cityList.length);
+        int min = Math.min(randomNum,randomNum2);
+        int max = Math.max(randomNum,randomNum2);
+        Integer[] tour = new Integer[max-min];
+        int index = 0;
+        for (int i=min; i<max; i++)
+        {
+            tour[index] = getCity(i);
+            index++;
+        }
+        index--;
+        for (int i=min; i<max; i++)
+        {
+            setCity(i, tour[index]);
+            index--;
+        }
     }
 
 }

@@ -172,6 +172,7 @@ public class TSP {
             temp = Chromosome.uniformOrderBasedCrossover(parent1, parent2, cities);
             for (int i=0; i<2; i++)
             {
+                temp[i].mutate();
                 temp[i].calculateCost(cities);
                 //System.out.println("Temp "+i+" cost: "+temp[i].getCost());
                 children[outeri+i] = temp[i];
@@ -193,7 +194,7 @@ public class TSP {
             while (index<tournamentSize)
             {
                 randomNum = Math.random();
-                if (randomNum<0.5)
+                if (randomNum<0.7)
                 {
                     //iterate through children
                     for (int i=0; i<selectedParents; i++)
