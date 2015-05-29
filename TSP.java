@@ -105,8 +105,8 @@ public class TSP {
 
     public static void evolve() {
         //Write evolution code here.
-        matingPopulationSize = populationSize/5*4;
-        selectedParents = populationSize/3*2;
+        matingPopulationSize = populationSize/5;
+        selectedParents = populationSize/5*3;
         if (selectedParents%2==1)
         {
             selectedParents++;
@@ -169,10 +169,10 @@ public class TSP {
                 }  
             }   
 
-        System.out.println("after "+testingCount);
+        //System.out.println("after "+testingCount);
        
             //Recombination method call to Chromosone.java  
-            temp = Chromosome.uniformOrderBasedCrossover(parent1, parent2, cities);
+            temp = parent1.onePointCrossover(parent2, cities);
             for (int i=0; i<2; i++)
             {
                 temp[i].mutate();  
@@ -181,7 +181,20 @@ public class TSP {
             }
         }
 
-        Chromosome[] newGen = new Chromosome[populationSize]; 
+        Chromosome.sortChromosomes(chromosomes, populationSize);
+        int numElite = populationSize/20;
+
+        for (int i=numElite; i<numElite+selectedParents; i++)
+        {
+            chromosomes[i] = children[i-numElite];
+
+        }
+        for (int i=numElite+selectedParents; i<populationSize; i++)
+        {
+            chromosomes[i] = new Chromosome(cities);
+        }
+
+       /* Chromosome[] newGen = new Chromosome[populationSize]; 
         Chromosome.sortChromosomes(children, selectedParents);
         ArrayList<Double> chosenChild = new ArrayList<Double>(); 
         ArrayList<Double> chosenParent = new ArrayList<Double>(); 
@@ -227,8 +240,8 @@ public class TSP {
                 i--;
             }
         }
-        System.out.println(populationSize+"-"+newGen[populationSize-1].getCost());
-        chromosomes = newGen;
+        //System.out.println(populationSize+"-"+newGen[populationSize-1].getCost());
+        chromosomes = newGen;*/
 
         //Replacement *Survival Selection
 

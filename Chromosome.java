@@ -118,7 +118,56 @@ class Chromosome {
         }
     }
 
-    public static Chromosome[] uniformOrderBasedCrossover(Chromosome parent1, Chromosome parent2, City[] cities)
+    public Chromosome[] onePointCrossover(Chromosome parent2, City[] cities)
+    {
+        Random generator = new Random();
+        int randomPt = generator.nextInt(cityList.length-1);
+        Chromosome[] children = new Chromosome[2];
+            
+        children[0] = new Chromosome(cities);
+        children[1] = new Chromosome(cities);
+
+        int[] child1 = new int[cityList.length];
+        int[] child2 = new int[cityList.length];
+
+        for (int i=0; i<randomPt; i++)
+        {
+            child1[i] = getCity(i);
+            child2[i] = parent2.getCity(i);
+        }
+        int index1 = randomPt;
+        int index2 = randomPt;
+
+
+        for (int i=0; i<cityList.length; i++)
+        {
+            if (!(elementInArray(child1, parent2.getCity(i))))
+            {
+                child1[index1] = parent2.getCity(i);
+                index1++;
+            }
+            if (!(elementInArray(child2, getCity(i))))
+            {
+                child2[index2] = getCity(i);
+                index2++;
+            }
+        }
+        children[0].setCities(child1);
+        children[1].setCities(child2);
+        return children;
+    }
+
+    private boolean elementInArray(int[] array, int element)
+    {
+        for (int i=0; i<array.length; i++)
+        {
+            if (array[i]==element)
+                return true;
+        }
+        return false;
+    }
+
+    public Chromosome[] uniformOrderBasedCrossover(Chromosome parent2, City[] cities)
     {
         double probability = 0.5;
         double randomNum;
@@ -132,13 +181,13 @@ class Chromosome {
         children[1] = new Chromosome(cities);
             
             
-        for (int j=0; j<parent1.cityList.length; j++)
+        for (int j=0; j<cityList.length; j++)
         {
             randomNum = Math.random();
             if (randomNum < probability)
             {
-                children[0].setCity(j, parent1.getCity(j));
-                child1Values.add(parent1.getCity(j));
+                children[0].setCity(j, getCity(j));
+                child1Values.add(getCity(j));
                 
                 children[1].setCity(j, parent2.getCity(j));
                 child2Values.add(parent2.getCity(j));
@@ -161,12 +210,12 @@ class Chromosome {
             children[0].setCity(notSwappedIndices.get(j), parent2.getCity(index1));
             child1Values.add(parent2.getCity(index1));
 
-            while (child2Values.contains(parent1.getCity(index2)))
+            while (child2Values.contains(getCity(index2)))
             {
                 index2++;
             }
-            children[1].setCity(notSwappedIndices.get(j), parent1.getCity(index2));
-            child2Values.add(parent1.getCity(index2));
+            children[1].setCity(notSwappedIndices.get(j), getCity(index2));
+            child2Values.add(getCity(index2));
         
         }   
         return children;
