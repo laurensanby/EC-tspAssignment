@@ -112,6 +112,15 @@ public class TSP {
             selectedParents++;
         }
         Chromosome.sortChromosomes(chromosomes, populationSize);
+        //assign fitness
+        double selectionPressure = 1.5; //for medium selection pressure =1.5 (1<sP<2)
+        double worstGenotype = 2 - selectionPressure;
+        
+        for (int i=0; i<matingPopulationSize; i++)
+        {
+            chromosomes[i].setFitness((1.0/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1.0)/(populationSize-1.0)))));
+        }
+
         //Chromosome[] temp = new Chromosome[selectedParents];
         //Choose random number to decide selection method
         double randomNum = Math.random();
@@ -122,12 +131,11 @@ public class TSP {
         //Selection        
         //Rank: Genotypes ranked by fitness. Selection probablity calculated based on rank
         double p = 0;
-        int count = 0;            
-        ArrayList<Integer> chosen = new ArrayList<Integer>();
-        //Select ith genotype with probability p[i] - linear selection
-        double selectionPressure = 1.5; //for medium selection pressure (1<sP<2)
-        double worstGenotype = 2 - selectionPressure;
-            
+        int count = 0;      
+        int testingCount = 0;      
+        //ArrayList<Integer> chosen = new ArrayList<Integer>();
+        //Select ith genotype with probability p[i] - linear selection        
+          
         for (int outeri=0; outeri<selectedParents; outeri+=2)
         {
             count =0;
@@ -135,66 +143,115 @@ public class TSP {
             {
                 for (int i=0; i<matingPopulationSize; i++)
                 {
-                    if (!(chosen.contains(i)) && (count<2))
+                    if (count<2)
                     {
                         //Linear Ranking
-                        p = (1.0/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1.0)/(populationSize-1.0))));
+                        p = chromosomes[i].getFitness();//CHANGE SO THAT TOP RANK HAS 100% CHANCE OF BEING PICKED
                         randomNum = Math.random();
                         if (randomNum < p)
                         {
                             if (count<1)
                             {
                                 parent1 = chromosomes[i];
-                                chosen.add(i);
-                                //System.out.println(outeri+" chosen "+ chromosomes[i].getCost());
                                 count++;
+                                break;
                             }
                             
                             else
                             {
                                 parent2 = chromosomes[i];
-                                chosen.add(i);
-                                //System.out.println(outeri+" chosen "+ chromosomes[i].getCost());
                                 count++;
                                 break;
-                            }
-                            //remove chromosome from chromosomes
-                            
+                            }                            
                         }
-                    }                  
+                    }
+                    testingCount++;                  
                 }  
             }   
 
+        System.out.println("after "+testingCount);
        
-            //Recombination **method call to Chromosone.java  
-            //System.out.println("Parent1 cost "+parent1.getCost());
-            //System.out.println("Parent2 cost "+parent2.getCost());
+            //Recombination method call to Chromosone.java  
             temp = Chromosome.uniformOrderBasedCrossover(parent1, parent2, cities);
             for (int i=0; i<2; i++)
             {
-                temp[i].mutate();
+                temp[i].mutate();  
                 temp[i].calculateCost(cities);
-                //System.out.println("Temp "+i+" cost: "+temp[i].getCost());
                 children[outeri+i] = temp[i];
             }
         }
-        
-        //Mutation **method call to Chromosone.java **with Probability
+
+        Chromosome[] newGen = new Chromosome[populationSize]; 
+        Chromosome.sortChromosomes(children, selectedParents);
+        ArrayList<Double> chosenChild = new ArrayList<Double>(); 
+        ArrayList<Double> chosenParent = new ArrayList<Double>(); 
+        int childi = 0;
+        int parenti = 0;
+        for (int i=0; i<populationSize; i++)
+        {
+            if (childi<selectedParents && parenti<populationSize)
+            {
+                if (children[childi].getCost()<chromosomes[parenti].getCost())
+                {
+                    if (!(chosenChild.contains(children[childi].getCost())))
+                    {
+                        newGen[i] = children[childi];
+                        chosenChild.add(children[childi].getCost());
+                        childi++;
+                    }
+                    else
+                    {
+                        childi++;
+                        i--;
+                    }
+                }
+                else
+                {
+                    if (!(chosenParent.contains(chromosomes[parenti].getCost())))
+                    {
+                        newGen[i] = chromosomes[parenti];
+                        chosenParent.add(chromosomes[parenti].getCost());
+                        parenti++;
+                    }
+                    else
+                    {
+                        parenti++;
+                        i--;
+                    }
+                }
+            }
+            else
+            {
+                childi=0;
+                parenti=0;
+                i--;
+            }
+        }
+        System.out.println(populationSize+"-"+newGen[populationSize-1].getCost());
+        chromosomes = newGen;
 
         //Replacement *Survival Selection
+
+
         //Tournament selection 
-        Chromosome[] newGen = new Chromosome[populationSize];  
+        /*Chromosome[] newGen = new Chromosome[populationSize];  
         ArrayList<Double> chosenGen = new ArrayList<Double>(); 
+        Chromosome.sortChromosomes(children, selectedParents-1);
+        newGen[0] = children[0];
+        chosenGen.add(children[0].getCost());
+        newGen[1] = chromosomes[0];
+        chosenGen.add(chromosomes[0].getCost());
+
         int index =0;
-        int tournamentSize = 5;
+        int tournamentSize = 3;
         Chromosome[] tournament = new Chromosome[tournamentSize];
-        for (int outerIndex = 0; outerIndex<populationSize; outerIndex++)
+        for (int outerIndex = 2; outerIndex<populationSize; outerIndex++)
         {
             index = 0;
             while (index<tournamentSize)
             {
                 randomNum = Math.random();
-                if (randomNum<0.7)
+                if (randomNum<0.5)
                 {
                     //iterate through children
                     for (int i=0; i<selectedParents; i++)
@@ -202,7 +259,7 @@ public class TSP {
                         if (!(chosenGen.contains(children[i].getCost())))
                         {
                             randomNum = Math.random();
-                            if (randomNum<0.3)
+                            if (randomNum<0.2)
                             {
                                 tournament[index] = children[i];
                                 index++;
@@ -219,7 +276,7 @@ public class TSP {
                         if (!(chosenGen.contains(chromosomes[i].getCost())))
                         {
                             randomNum = Math.random();
-                            if (randomNum<0.3)
+                            if (randomNum<0.2)
                             {
                                 tournament[index] = chromosomes[i];
                                 index++;
@@ -233,9 +290,11 @@ public class TSP {
             newGen[outerIndex] = tournament[0];
             chosenGen.add(tournament[0].getCost());
         }
-        chromosomes = newGen;
+        chromosomes = newGen;*/
 
-        /*for (int i=populationSize-selectedParents; i<populationSize; i++)
+        
+        /*int index = 0;
+        for (int i=populationSize-selectedParents; i<populationSize; i++)
         {
             chromosomes[i] = children[index];
             index++;

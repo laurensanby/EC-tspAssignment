@@ -13,6 +13,16 @@ class Chromosome {
      */
     protected double cost;
 
+    protected double fitness;
+    double getFitness()
+    {
+        return fitness;
+    }
+    void setFitness(double value)
+    {
+        fitness = value;
+    }
+
     /**
      * @param cities The order that this chromosome would visit the cities.
      */
@@ -164,23 +174,83 @@ class Chromosome {
 
     public void mutate()
     {
-       // double randomNum = Math.random();
+        double randomNum = Math.random();
 
         //Inversion
-        //if (randomNum<0.5)
+        if (randomNum<0.2)
             inversion();
 
-        //randomNum = Math.random();
+        randomNum = Math.random();
 
         //Translocation (insertion)
-        //if (randomNum<0.5)
+        if (randomNum<0.25)
             translocation();
 
-        //Transposition (2-exchange)
-        //Exchange two randomly chosen points
+        randomNum = Math.random();
 
+        //Transposition (2-exchange)
+        if (randomNum<0.4)
+            transposition();
+
+        randomNum = Math.random();
         //3-point exchange (shifting)
+        if (randomNum<0.25)
+            shifting();
+        
+    }
+
+    public void shifting()
+    {
         // Shift randomly chosen segment (between two points) to a third point.
+        Random generator = new Random();
+        int randomLength = generator.nextInt(cityList.length/10);
+        int randomNum = generator.nextInt(cityList.length);
+        int randomNum2 = generator.nextInt(cityList.length);
+        int min = Math.min(randomNum,randomNum2);
+        int max = Math.max(randomNum,randomNum2);
+        int temp = 0;
+        while (max-min<2)
+        {
+            max = generator.nextInt(cityList.length);
+            temp = Math.min(min,max);
+            max = Math.max(min,max);
+            min = temp;
+        }
+        if (min+randomLength>=max)
+        {
+            randomLength = max-min-1;
+        }
+        Integer[] tour = new Integer[randomLength];
+        int index = 0;
+        int index2 = 0;
+        for (int i=min; i<max; i++)
+        {
+            if (index < randomLength)
+            {
+                tour[index] = getCity(i);
+                index++;
+            }
+            if (randomLength + i < max)
+            {
+                setCity(i, getCity(randomLength+i));
+            }
+            else
+            {
+                setCity(i, tour[index2]);
+                index2++;
+            }
+        }
+    }
+
+    public void transposition()
+    {
+        //Exchange two randomly chosen points
+        Random generator = new Random();
+        int randomNum = generator.nextInt(cityList.length);
+        int randomNum2 = generator.nextInt(cityList.length);
+        int tempCity = getCity(randomNum);
+        setCity(randomNum, getCity(randomNum2));
+        setCity(randomNum2, tempCity);
     }
 
     public void translocation()
@@ -203,11 +273,14 @@ class Chromosome {
     {
         //cut out random segment, and re-insert in opposite direction
         Random generator = new Random();
-        //CHOOSE length, and then choose starting value and then choose starting value to min of length and totallength-start
         int randomNum = generator.nextInt(cityList.length);
         int randomNum2 = generator.nextInt(cityList.length);
         int min = Math.min(randomNum,randomNum2);
         int max = Math.max(randomNum,randomNum2);
+        if (max-min>cityList.length/50)
+        {
+            max=min+cityList.length/50;
+        }
         Integer[] tour = new Integer[max-min];
         int index = 0;
         for (int i=min; i<max; i++)
