@@ -106,14 +106,14 @@ public class TSP {
     public static void evolve() {
         //Write evolution code here.
         matingPopulationSize = populationSize/5;
-        selectedParents = populationSize/5*3;
+        selectedParents = populationSize/5*4;
         if (selectedParents%2==1)
         {
             selectedParents++;
         }
         Chromosome.sortChromosomes(chromosomes, populationSize);
         //assign fitness
-        double selectionPressure = 1.5; //for medium selection pressure =1.5 (1<sP<2)
+        double selectionPressure = 1.9; //for medium selection pressure =1.5 (1<sP<2)
         double worstGenotype = 2 - selectionPressure;
         
         for (int i=0; i<matingPopulationSize; i++)
@@ -146,7 +146,7 @@ public class TSP {
                     if (count<2)
                     {
                         //Linear Ranking
-                        p = chromosomes[i].getFitness();//CHANGE SO THAT TOP RANK HAS 100% CHANCE OF BEING PICKED
+                        p = chromosomes[i].getFitness();
                         randomNum = Math.random();
                         if (randomNum < p)
                         {
