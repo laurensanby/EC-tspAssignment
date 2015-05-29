@@ -106,7 +106,7 @@ public class TSP {
     public static void evolve() {
         //Write evolution code here.
         matingPopulationSize = populationSize/5*4;
-        selectedParents = populationSize/2;
+        selectedParents = populationSize/3*2;
         if (selectedParents%2==1)
         {
             selectedParents++;
@@ -181,13 +181,64 @@ public class TSP {
         //Mutation **method call to Chromosone.java **with Probability
 
         //Replacement *Survival Selection
-        //Elitist?
-        int index = 0;
-        for (int i=populationSize-selectedParents; i<populationSize; i++)
+        //Tournament selection 
+        Chromosome[] newGen = new Chromosome[populationSize];  
+        ArrayList<Double> chosenGen = new ArrayList<Double>(); 
+        int index =0;
+        int tournamentSize = 5;
+        Chromosome[] tournament = new Chromosome[tournamentSize];
+        for (int outerIndex = 0; outerIndex<populationSize; outerIndex++)
+        {
+            index = 0;
+            while (index<tournamentSize)
+            {
+                randomNum = Math.random();
+                if (randomNum<0.5)
+                {
+                    //iterate through children
+                    for (int i=0; i<selectedParents; i++)
+                    {
+                        if (!(chosenGen.contains(children[i].getCost())))
+                        {
+                            randomNum = Math.random();
+                            if (randomNum<0.3)
+                            {
+                                tournament[index] = children[i];
+                                index++;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //iterate through parents
+                    for (int i=0; i<populationSize; i++)
+                    {
+                        if (!(chosenGen.contains(chromosomes[i].getCost())))
+                        {
+                            randomNum = Math.random();
+                            if (randomNum<0.3)
+                            {
+                                tournament[index] = chromosomes[i];
+                                index++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            Chromosome.sortChromosomes(tournament, tournamentSize-1);
+            newGen[outerIndex] = tournament[0];
+            chosenGen.add(tournament[0].getCost());
+        }
+        chromosomes = newGen;
+
+        /*for (int i=populationSize-selectedParents; i<populationSize; i++)
         {
             chromosomes[i] = children[index];
             index++;
-        }
+        }*/
         
     }
 
