@@ -161,4 +161,20 @@ class Chromosome {
         }   
         return children;
     }
+
+    public static void mutate(Chromosome child)
+    {
+        //Inversion
+        //cut out random segment, and re-insert in opposite direction
+
+        //Translocation (insertion)
+        //Select random position and insert into new random position
+
+        //Transposition (2-exchange)
+        //Exchange two randomly chosen points
+
+        //3-point exchange (shifting)
+        // Shift randomly chosen segment (between two points) to a third point.
+    }
+
 }
