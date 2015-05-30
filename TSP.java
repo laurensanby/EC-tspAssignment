@@ -111,19 +111,20 @@ public class TSP {
         {
             selectedParents++;
         }
+        Random generator = new Random();
         Chromosome.sortChromosomes(chromosomes, populationSize);
         //assign fitness
-        double selectionPressure = 1.9; //for medium selection pressure =1.5 (1<sP<2)
+        double selectionPressure = 1.5; //for medium selection pressure =1.5 (1<sP<2)
         double worstGenotype = 2 - selectionPressure;
         
         for (int i=0; i<matingPopulationSize; i++)
         {
-            chromosomes[i].setFitness((1.0/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1.0)/(populationSize-1.0)))));
+            chromosomes[i].setFitness(((1.0/populationSize)*(worstGenotype + ((selectionPressure - worstGenotype)*((populationSize - i - 1.0)/(populationSize-1.0)))))*100.0);
         }
 
         //Chromosome[] temp = new Chromosome[selectedParents];
         //Choose random number to decide selection method
-        double randomNum = Math.random();
+        double randomNum = generator.nextDouble();
         Chromosome parent1 = null;
         Chromosome parent2 = null;
         Chromosome[] temp;
@@ -147,7 +148,9 @@ public class TSP {
                     {
                         //Linear Ranking
                         p = chromosomes[i].getFitness();
-                        randomNum = Math.random();
+                        randomNum = generator.nextDouble();
+
+                    testingCount++;
                         if (randomNum < p)
                         {
                             if (count<1)
@@ -164,8 +167,7 @@ public class TSP {
                                 break;
                             }                            
                         }
-                    }
-                    testingCount++;                  
+                    }                  
                 }  
             }   
 
@@ -182,7 +184,7 @@ public class TSP {
         }
 
         Chromosome.sortChromosomes(chromosomes, populationSize);
-        int numElite = populationSize/20;
+        int numElite = 0;
 
         for (int i=numElite; i<numElite+selectedParents; i++)
         {

@@ -223,27 +223,28 @@ class Chromosome {
 
     public void mutate()
     {
-        double randomNum = Math.random();
+        Random generator = new Random();
+        double randomNum = generator.nextDouble();
 
         //Inversion
-        if (randomNum<0.2)
+        if (randomNum<0.3)
             inversion();
 
-        randomNum = Math.random();
+        randomNum = generator.nextDouble();
 
         //Translocation (insertion)
-        if (randomNum<0.25)
+        if (randomNum<0.3)
             translocation();
 
-        randomNum = Math.random();
+        randomNum = generator.nextDouble();
 
         //Transposition (2-exchange)
-        if (randomNum<0.4)
+        if (randomNum<0.3)
             transposition();
 
-        randomNum = Math.random();
+        randomNum = generator.nextDouble();
         //3-point exchange (shifting)
-        if (randomNum<0.25)
+        if (randomNum<0.3)
             shifting();
         
     }
