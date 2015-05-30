@@ -105,7 +105,7 @@ public class TSP {
 
     public static void evolve() {
         //Write evolution code here.
-        matingPopulationSize = populationSize/5;
+        matingPopulationSize = populationSize/4;
         selectedParents = populationSize/5*4;
         if (selectedParents%2==1)
         {
@@ -114,7 +114,7 @@ public class TSP {
         Random generator = new Random();
         Chromosome.sortChromosomes(chromosomes, populationSize);
         //assign fitness
-        double selectionPressure = 1.5; //for medium selection pressure =1.5 (1<sP<2)
+        double selectionPressure = 1.2; //for medium selection pressure =1.5 (1<sP<2)
         double worstGenotype = 2 - selectionPressure;
         
         for (int i=0; i<matingPopulationSize; i++)
@@ -174,7 +174,7 @@ public class TSP {
         //System.out.println("after "+testingCount);
        
             //Recombination method call to Chromosone.java  
-            temp = parent1.onePointCrossover(parent2, cities);
+            temp = parent1.twoPointCrossover(parent2, cities);
             for (int i=0; i<2; i++)
             {
                 temp[i].mutate();  
@@ -184,7 +184,7 @@ public class TSP {
         }
 
         Chromosome.sortChromosomes(chromosomes, populationSize);
-        int numElite = 0;
+        int numElite = populationSize/50;
 
         for (int i=numElite; i<numElite+selectedParents; i++)
         {

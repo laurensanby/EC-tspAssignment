@@ -118,10 +118,33 @@ class Chromosome {
         }
     }
 
-    public Chromosome[] onePointCrossover(Chromosome parent2, City[] cities)
+    public Chromosome[] crossover(Chromosome parent2, City[] cities)
+    {
+        return twoPointCrossover(parent2, cities);
+    }
+
+    public Chromosome[] twoPointCrossover(Chromosome parent2, City[] cities)
     {
         Random generator = new Random();
         int randomPt = generator.nextInt(cityList.length-1);
+        int randomPt2 = generator.nextInt(cityList.length-1);
+        int max;
+        if (randomPt2<randomPt)
+        {
+            max = randomPt;
+            randomPt = randomPt2;
+            randomPt2 = max;
+        }
+        while (randomPt2-randomPt<2)
+        {
+            randomPt2 = generator.nextInt(cityList.length-1);
+            if (randomPt2<randomPt)
+            {
+                max = randomPt;
+                randomPt = randomPt2;
+                randomPt2 = max;
+            }
+        }
         Chromosome[] children = new Chromosome[2];
             
         children[0] = new Chromosome(cities);
@@ -130,20 +153,35 @@ class Chromosome {
         int[] child1 = new int[cityList.length];
         int[] child2 = new int[cityList.length];
 
-        for (int i=0; i<randomPt; i++)
+        for (int i=0; i<cityList.length; i++)
+        {
+            child1[i] = 42;
+            child2[i] = 42;
+        }
+        //swap
+        for (int i=randomPt; i<randomPt2; i++)
         {
             child1[i] = getCity(i);
             child2[i] = parent2.getCity(i);
         }
-        int index1 = randomPt;
-        int index2 = randomPt;
+        int index1 = 0;
+        int index2 = 0;
 
-
+        //repair
         for (int i=0; i<cityList.length; i++)
         {
+            if (index1==randomPt)
+            {
+                index1=randomPt2;
+            }
+            if (index2==randomPt)
+            {
+                index2 = randomPt2;
+            }
             if (!(elementInArray(child1, parent2.getCity(i))))
             {
                 child1[index1] = parent2.getCity(i);
+                
                 index1++;
             }
             if (!(elementInArray(child2, getCity(i))))
@@ -167,7 +205,7 @@ class Chromosome {
         return false;
     }
 
-    public Chromosome[] uniformOrderBasedCrossover(Chromosome parent2, City[] cities)
+   /* public Chromosome[] uniformOrderBasedCrossover(Chromosome parent2, City[] cities)
     {
         double probability = 0.5;
         double randomNum;
@@ -219,7 +257,7 @@ class Chromosome {
         
         }   
         return children;
-    }
+    }*/
 
     public void mutate()
     {
@@ -227,24 +265,24 @@ class Chromosome {
         double randomNum = generator.nextDouble();
 
         //Inversion
-        if (randomNum<0.3)
+        if (randomNum<0.7)
             inversion();
 
         randomNum = generator.nextDouble();
 
         //Translocation (insertion)
-        if (randomNum<0.3)
+        if (randomNum<0.7)
             translocation();
 
         randomNum = generator.nextDouble();
 
         //Transposition (2-exchange)
-        if (randomNum<0.3)
+        if (randomNum<0.7)
             transposition();
 
         randomNum = generator.nextDouble();
         //3-point exchange (shifting)
-        if (randomNum<0.3)
+        if (randomNum<0.7)
             shifting();
         
     }
