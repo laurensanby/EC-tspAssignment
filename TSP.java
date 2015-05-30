@@ -105,7 +105,7 @@ public class TSP {
 
     public static void evolve() {
         //Write evolution code here.
-        matingPopulationSize = populationSize/4;
+        matingPopulationSize = populationSize/5*3;
         selectedParents = populationSize/5*4;
         if (selectedParents%2==1)
         {
@@ -114,7 +114,7 @@ public class TSP {
         Random generator = new Random();
         Chromosome.sortChromosomes(chromosomes, populationSize);
         //assign fitness
-        double selectionPressure = 1.2; //for medium selection pressure =1.5 (1<sP<2)
+        double selectionPressure = 1.8; //for medium selection pressure =1.5 (1<sP<2)
         double worstGenotype = 2 - selectionPressure;
         
         for (int i=0; i<matingPopulationSize; i++)
@@ -177,7 +177,11 @@ public class TSP {
             temp = parent1.twoPointCrossover(parent2, cities);
             for (int i=0; i<2; i++)
             {
-                temp[i].mutate();  
+                randomNum = generator.nextDouble();
+                if (randomNum<0.6)
+                {
+                    temp[i].mutate();  
+                }
                 temp[i].calculateCost(cities);
                 children[outeri+i] = temp[i];
             }
