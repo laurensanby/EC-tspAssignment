@@ -120,8 +120,89 @@ class Chromosome {
 
     public Chromosome[] crossover(Chromosome parent2, City[] cities)
     {
-        return twoPointCrossover(parent2, cities);
+        Chromosome[] children1 = partialMappingCrossover(parent2, cities);
+        Chromosome[] children2 = twoPointCrossover(parent2, cities);
+        Chromosome[] children = new Chromosome[4];
+        for (int i=0; i<2; i++)
+        {
+            children[i] = children1[i];
+        }
+        for (int i=0; i<2; i++)
+        {
+            children[i+2] = children2[i];
+        }
+
+        return children;
     }
+
+    public Chromosome[] partialMappingCrossover(Chromosome parent2, City[] cities)
+    {
+        Random generator = new Random();
+        int randomPt = generator.nextInt(cityList.length-1);
+        int randomPt2 = generator.nextInt(cityList.length-1);
+        int max;
+        if (randomPt2<randomPt)
+        {
+            max = randomPt;
+            randomPt = randomPt2;
+            randomPt2 = max;
+        }
+        while (randomPt2-randomPt<2)
+        {
+            randomPt2 = generator.nextInt(cityList.length-1);
+            if (randomPt2<randomPt)
+            {
+                max = randomPt;
+                randomPt = randomPt2;
+                randomPt2 = max;
+            }
+        }
+        Chromosome[] children = new Chromosome[2];
+            
+        children[0] = new Chromosome(cities);
+        children[1] = new Chromosome(cities);
+
+        int[] child1 = new int[cityList.length];
+        int[] child2 = new int[cityList.length];
+        //swap
+        for (int i=0; i<cityList.length; i++)
+        {
+            if (i<randomPt || i>=randomPt2)
+            {
+                children[0].setCity(i, getCity(i));
+                children[1].setCity(i, parent2.getCity(i));
+                child1[i] = 420000000;
+                child2[i] = 420000000;
+            }
+            else
+            {
+                children[0].setCity(i, parent2.getCity(i));
+                children[1].setCity(i, getCity(i));
+                child1[i] = parent2.getCity(i);
+                child2[i] = getCity(i);
+            }
+            
+        }
+        int mappedInt = 1000000000;
+        //repair
+        for (int i=0; i<cityList.length; i++)
+        {
+            if (i==randomPt)
+            {
+                i=randomPt2;
+            }
+            while (!((mappedInt=elementInArray(child1, children[0].getCity(i), true))==-1))
+            {
+                children[0].setCity(i, getCity(mappedInt));                    
+            }
+            while (!((mappedInt=elementInArray(child2, children[1].getCity(i), true))==-1))
+            {
+                children[1].setCity(i, parent2.getCity(mappedInt));
+            }
+        }
+        return children;
+    }
+
 
     public Chromosome[] twoPointCrossover(Chromosome parent2, City[] cities)
     {
@@ -205,59 +286,15 @@ class Chromosome {
         return false;
     }
 
-   /* public Chromosome[] uniformOrderBasedCrossover(Chromosome parent2, City[] cities)
+    private int elementInArray(int[] array, int element, boolean returnInt)
     {
-        double probability = 0.5;
-        double randomNum;
-        ArrayList<Integer> notSwappedIndices = new ArrayList<Integer>();
-        ArrayList<Integer> child1Values = new ArrayList<Integer>();
-        ArrayList<Integer> child2Values = new ArrayList<Integer>();
-       
-        Chromosome[] children = new Chromosome[2];
-            
-        children[0] = new Chromosome(cities);
-        children[1] = new Chromosome(cities);
-            
-            
-        for (int j=0; j<cityList.length; j++)
+        for (int i=0; i<array.length; i++)
         {
-            randomNum = Math.random();
-            if (randomNum < probability)
-            {
-                children[0].setCity(j, getCity(j));
-                child1Values.add(getCity(j));
-                
-                children[1].setCity(j, parent2.getCity(j));
-                child2Values.add(parent2.getCity(j));
-               
-            }
-            else
-            {
-                notSwappedIndices.add(j);
-            }
-        } 
-        int index1 = 0;
-        int index2 = 0;
-        for (int j=0; j<notSwappedIndices.size(); j++)
-        {
-            while (child1Values.contains(parent2.getCity(index1)))
-            {
-                index1++;
-            }
-            
-            children[0].setCity(notSwappedIndices.get(j), parent2.getCity(index1));
-            child1Values.add(parent2.getCity(index1));
-
-            while (child2Values.contains(getCity(index2)))
-            {
-                index2++;
-            }
-            children[1].setCity(notSwappedIndices.get(j), getCity(index2));
-            child2Values.add(getCity(index2));
-        
-        }   
-        return children;
-    }*/
+            if (array[i]==element)
+                return i;
+        }
+        return -1;
+    }
 
     public void mutate()
     {
